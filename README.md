@@ -2,7 +2,7 @@ Open AWS Console from CLI
 -------------------------
 This script is for developers who have AWS API keys for development and need
 the occasional console access. It gives them console access using only the keys
-and a special role. So  with this script you no longer have to worry about
+and a special role. With this script you no longer have to worry about
 password/multi-factor auth or anything other than your API key pair that you
 already have.
 
@@ -10,9 +10,8 @@ The script is entirely self contained so you run it once (with a flag) to setup
 the role and from that point on you can just run it and your console should pop
 up in your browser.
 
-It is compatible with python2 and python3.
-Requires standard lib + [boto](http://docs.pythonboto.org/) +
-[requests](http://python-requests.org).
+It is compatible with python2 and python3 and requires standard lib +
+[boto](http://docs.pythonboto.org/) + [requests](http://python-requests.org).
 
 Usage
 -----
