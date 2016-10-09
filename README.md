@@ -1,6 +1,5 @@
-Open AWS consoles from CLI using only your key pair
----------------------------------------------------
-
+Open AWS Console from CLI
+-------------------------
 This script is for developers who have AWS API keys for development and need
 the occasional console access. It gives them console access using only the keys
 and a special role. So  with this script you no longer have to worry about
