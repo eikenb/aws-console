@@ -69,7 +69,7 @@ def accountId():
     """ Return account-id based on credentials in environment.
     """
     # save the lookup if we set the account to the environment
-    if os.environ.has_key("AWS_ACCOUNT_ID"):
+    if "AWS_ACCOUNT_ID" in os.environ:
         return os.environ["AWS_ACCOUNT_ID"]
     conn = iamConn()
     arn = conn.get_user().get('get_user_response')\
