@@ -72,8 +72,18 @@ def accountId():
     if "AWS_ACCOUNT_ID" in os.environ:
         return os.environ["AWS_ACCOUNT_ID"]
     conn = iamConn()
-    arn = conn.get_user().get('get_user_response')\
-            .get('get_user_result').get('user').get('arn')
+    funcs = [
+        lambda: conn.get_user().get('get_user_response')\
+            .get('get_user_result').get('user').get('arn'),
+        lambda: conn.list_roles(max_items=1).get('list_roles_response')\
+            .get('list_roles_result').get('roles')[0].get('arn'),
+    ]
+    for func in funcs:
+        try:
+            arn = func()
+            break
+        except (boto.exception.BotoServerError, IndexError):
+            pass
     return arn.split(':')[4]
 
 def hasRole():
