@@ -18,6 +18,7 @@ import json
 import os
 import requests
 import webbrowser
+import time
 import boto.iam
 from boto.sts import STSConnection
 
@@ -44,6 +45,8 @@ def parseArgs():
     parser.add_argument('-n', '--role-name', action='store',
             default=ROLE_NAME,
             help="name of required role to create/use (" + ROLE_NAME + ")")
+    parser.add_argument('-t', '--temp-role', action='store_true',
+            help="Create role only for this connection, then delete it.")
 
     return parser.parse_args()
 
@@ -126,12 +129,24 @@ assume_role_policy = """
 def createRole():
     """ Create STS/assume-role policy and role.
     """
-    if hasRole(): return
+    if hasRole(): return False
     conn = iamConn()
     role = getArgs().role_name
     conn.create_role(role, assume_role_policy.strip().format(accountId()))
     conn.put_role_policy(role, 'Admin', admin_policy.strip())
     print("Role created:", role)
+    return True
+
+def removeRole():
+    """ Removes STS/assume-role role.
+    """
+    if not hasRole(): return False
+    conn = iamConn()
+    role = getArgs().role_name
+    conn.delete_role_policy(role, 'Admin')
+    conn.delete_role(role)
+    print("Role deleted:", role)
+    return True
 
 def openConsole():
     """ Get STS token and open AWS console.
@@ -190,6 +205,20 @@ def openConsole():
 if __name__ == "__main__":
     if getArgs().create_role:
         createRole()
+    elif getArgs().temp_role:
+        if createRole():
+            print("Waiting for role to propagate.")
+        count = 0
+        while True:
+            count += 1
+            try:
+                openConsole()
+                break
+            except boto.exception.BotoServerError:
+                time.sleep(1) # time for role to get ready
+                if count > 5: raise
+        raw_input("Press any key to remove role and end session...")
+        removeRole()
     else:
         openConsole()
 
